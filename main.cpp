@@ -64,4 +64,5 @@ int main() {
     }
 
     std::cerr << "\nDone.\n";
+    return 0;
 }
