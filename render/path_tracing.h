@@ -25,7 +25,7 @@ color path_trace(ray& r, hittable_list& world, int bounces) {
         scatter_record s_rec;
         mat->scatter(r, hit_rec, s_rec);
 
-        auto n = hit_rec.obj->normal(hit_rec.p);
+        auto n = hit_rec.obj->normal(hit_rec.origin);
              n = dot(n, r.dir)>0 ? -n:n;
         auto cosine = dot(s_rec.r_out.dir, n);
 
@@ -65,24 +65,24 @@ color path_trace_directL(ray& r, hittable_list& world, hittable_list& lights, in
         }
 
         // compute surface normal and cosine
-        auto n = hit_rec.obj->normal(hit_rec.p);
+        auto n = hit_rec.obj->normal(hit_rec.origin);
              n = dot(n, r.dir)>0 ? -n:n;
 
         // direct light
         for(int j=0; j<1; j++) {
             sampled = lights.sample(sample_pdf);
-            sample_r = ray(hit_rec.p, unit_vector(sampled-hit_rec.p));
+            sample_r = ray(hit_rec.origin, unit_vector(sampled-hit_rec.origin));
 
             hit_record sample_rec;
             if(!world.hit(sample_r, epsilon, infinity, sample_rec)) {continue;}
 
             // check if hits the sampled point
-            if(sampled != sample_rec.p) {continue;}
+            if(sampled != sample_rec.origin) {continue;}
 
             sample_mat = sample_rec.obj->mat;
             if(sample_mat->name != "Light") {continue;}
 
-            auto n_L = sample_rec.obj->normal(sample_rec.p); // normal at light source
+            auto n_L = sample_rec.obj->normal(sample_rec.origin); // normal at light source
                  n_L = dot(n_L, sample_r.dir)>0 ? -n_L:n_L;
             auto cosine_L = - dot(sample_r.dir, n_L); // cosine term at light source
             auto cosine_r = dot(n, sample_r.dir); // cosine term at hittable object
@@ -91,7 +91,7 @@ color path_trace_directL(ray& r, hittable_list& world, hittable_list& lights, in
             if(cosine_r <= 0) {continue;}
 
             L += beta * mat->reflectance * sample_mat->emit *
-                 cosine_r * cosine_L / (sample_rec.p-hit_rec.p).length_squared() * sample_pdf;
+                 cosine_r * cosine_L / (sample_rec.origin-hit_rec.origin).length_squared() * sample_pdf;
         }
 
         // Russian Roulette

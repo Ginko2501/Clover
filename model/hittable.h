@@ -4,7 +4,7 @@
 #include "../clover.h"
 
 class material;
-struct hit_record;
+class hit_record;
 
 class hittable {
     public:

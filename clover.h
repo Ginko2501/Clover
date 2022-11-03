@@ -19,7 +19,8 @@
 
 // scene
 #include "model/camera.h"
-#include "model/hit_record.h"
+#include "model/neighborhood.h"
+// #include "model/hit_record.h"
 #include "model/hittable.h"
 #include "model/hittable_list.h"
 #include "model/sphere.h"

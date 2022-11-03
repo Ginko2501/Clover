@@ -5,12 +5,12 @@
 
 struct hit_record;
 
-struct scatter_record {
-    ray r_out;
-    color reflectance;
-    double pdf;
-    double brdf;
-};
+// struct scatter_record {
+//     ray r_out;
+//     color reflectance;
+//     double pdf;
+//     double brdf;
+// };
 
 class material {
     public:
@@ -62,7 +62,6 @@ class lambertian : public material {
                 scatter_direction = n;
 
             s_rec.r_out = ray(rec.p, unit_vector(scatter_direction));
-            s_rec.reflectance = reflectance;
             s_rec.pdf = pi;
             s_rec.brdf = pi; 
         }
@@ -83,7 +82,6 @@ class metal : public material {
         ) override {
             vec3 reflected = reflect(unit_vector(r_in.direction()), rec.obj->normal(rec.p));
             s_rec.r_out = ray(rec.p, reflected + fuzz*random_in_unit_sphere());
-            s_rec.reflectance = reflectance;
             //return (dot(scattered.direction(), rec.normal()) > 0);
         }
 

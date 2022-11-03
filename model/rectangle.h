@@ -12,12 +12,10 @@ class rectangle : public hittable {
             horizontal = h;
             vertical = v;
             mat = m;
-            //name = "Rectangle";
+            n = unit_vector(cross(horizontal, vertical));
         }
 
-        virtual vec3 normal(const point3& p) override {
-            return unit_vector(cross(horizontal, vertical));
-        }
+        virtual vec3 normal(const point3& p) override { return n;}
 
         bool in_range(const point3& p);
 
@@ -30,6 +28,7 @@ class rectangle : public hittable {
     public:
         vec3 horizontal;
         vec3 vertical;
+        vec3 n;
 };
 
 bool rectangle::in_range(const point3& p) {
@@ -51,8 +50,9 @@ bool rectangle::hit(const ray& r, double t_min, double t_max, hit_record& rec) {
     if (!in_range(r.at(t))) return false;
 
     rec.t = t;
-    rec.p = r.at(t);
     rec.obj = this;
+    rec.origin = r.at(t);
+    rec.normal = dot(n, r.dir)>0 ? -n:n;
 
     return true;
 }
