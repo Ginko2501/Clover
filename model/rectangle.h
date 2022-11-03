@@ -51,6 +51,7 @@ bool rectangle::hit(const ray& r, double t_min, double t_max, hit_record& rec) {
 
     rec.t = t;
     rec.obj = this;
+    rec.p = r.at(t);
     rec.origin = r.at(t);
     rec.normal = dot(n, r.dir)>0 ? -n:n;
 

@@ -32,9 +32,9 @@
 
 // rendering methods
 #include "render/path_tracing.h"
-#include "render/path_tracing_recursive.h"
-#include "render/sphere_tracing_analytic.h"
-#include "render/sphere_tracing_voxel.h"
+// #include "render/path_tracing_recursive.h"
+// #include "render/sphere_tracing_analytic.h"
+// #include "render/sphere_tracing_voxel.h"
 
 // inverse rendering
 #include "inverse rendering/loss.h"

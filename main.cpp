@@ -4,7 +4,6 @@
 hittable_list world;
 hittable_list lights;
 voxel_grid SDF;
-hittable* obj;
 
 int main() {
     freopen("./images/image.ppm", "w", stdout);
@@ -21,18 +20,9 @@ int main() {
     //hello_world_IR(world, lights, cam, material_center);
     //cornell_box(world, lights, cam);
 
-    // hittable* obj;
-    // std::cerr<<world.dist(point3(0,1.5,-1), obj)<<"\n";
-    // return 0;
-
     // Voxel_Grid
     //SDF.init(world);
     
-
-    // std::cerr<<world.dist(point3(0,0,1), obj)<<"\n";
-    // std::cerr<<SDF.at(point3(0,0,1))<<"\n";
-    // return 0;
-
     // check single ray trace
     // auto u = 0.773971;
     // auto v = 0.997264;
@@ -47,9 +37,7 @@ int main() {
 
     for (int j = image_height-1; j >= 0; --j) {
         std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
-        //if(j!=254) continue;
         for (int i = 0; i < image_width; ++i) {
-            //if(i!=197) continue;
             color pixel_color(0, 0, 0);
             for (int s = 0; s < samples_per_pixel; ++s) {
                 auto u = (i + 1.2*random_double()) / (image_width-1);

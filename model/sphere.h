@@ -50,8 +50,9 @@ bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) {
     // Update hit record
     rec.t = root;
     rec.obj = this;
+    rec.p = r.at(rec.t);
     rec.origin = r.at(rec.t);
-    rec.normal = normal(rec.p);
+    rec.normal = normal(rec.origin);
     rec.normal = dot(rec.normal, r.dir)>0 ? -rec.normal : rec.normal;
 
     return true;

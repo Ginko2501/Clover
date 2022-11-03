@@ -14,9 +14,7 @@ struct hit_record;
 
 class material {
     public:
-        virtual void scatter(
-            ray& r_in, hit_record& rec, scatter_record& s_rec
-        ) {}
+        virtual void scatter(ray& r_in, scatter_record& s_rec) {}
     
     public:
         std::string name;
@@ -51,9 +49,9 @@ class lambertian : public material {
         }
 
         virtual void scatter(
-            ray& r_in, hit_record& rec, scatter_record& s_rec
+            ray& r_in, scatter_record& rec
         ) override {
-            auto n = rec.obj->normal(rec.p);
+            auto n = rec.obj->normal(rec.origin);
                  n = dot(r_in.dir, n)>0 ? -n:n;
             auto scatter_direction = n + random_unit_vector();
 
@@ -61,9 +59,9 @@ class lambertian : public material {
             if (is_zero(scatter_direction))
                 scatter_direction = n;
 
-            s_rec.r_out = ray(rec.p, unit_vector(scatter_direction));
-            s_rec.pdf = pi;
-            s_rec.brdf = pi; 
+            rec.r_out = ray(rec.origin, unit_vector(scatter_direction));
+            rec.pdf = pi;
+            rec.brdf = pi; 
         }
 };
 
@@ -78,10 +76,10 @@ class metal : public material {
         }
 
         virtual void scatter(
-            ray& r_in,  hit_record& rec, scatter_record& s_rec
+            ray& r_in, scatter_record& rec
         ) override {
-            vec3 reflected = reflect(unit_vector(r_in.direction()), rec.obj->normal(rec.p));
-            s_rec.r_out = ray(rec.p, reflected + fuzz*random_in_unit_sphere());
+            vec3 reflected = reflect(unit_vector(r_in.direction()), rec.obj->normal(rec.origin));
+            rec.r_out = ray(rec.origin, reflected + fuzz*random_in_unit_sphere());
             //return (dot(scattered.direction(), rec.normal()) > 0);
         }
 
@@ -90,9 +88,12 @@ class metal : public material {
 };
 
 // do not declare as material
+auto material_light = light();
+auto material_light_dim = light(color(1, 1, 1));
+auto material_light_bright = light(color(10, 10, 10));
+
 auto material_ground = lambertian(color(0.1, 0.1, 0.0));
 auto material_center = lambertian(color(0.1, 0.2, 0.5));
-auto material_light = light();
 
 auto lambertian_red = lambertian(color(0.65, 0.05, 0.05));
 auto lambertian_green = lambertian(color(0.12, 0.45, 0.15));
