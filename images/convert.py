@@ -6,4 +6,4 @@ import numpy as np
 # print(img.read())
 
 img = cv.imread("image.ppm")
-cv.imwrite("./images/image.jpg", img)
+cv.imwrite("./image.jpg", img)

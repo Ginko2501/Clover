@@ -7,7 +7,7 @@ voxel_grid SDF;
 hittable* obj;
 
 int main() {
-    freopen("image.ppm", "w", stdout);
+    freopen("./images/image.ppm", "w", stdout);
 
     // Image
     const auto aspect_ratio = 1.0;
