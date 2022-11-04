@@ -12,13 +12,13 @@ int main() {
     const auto aspect_ratio = 1.0;
     const int image_width = 256;
     const int image_height = static_cast<int>(image_width / aspect_ratio);
-    const int samples_per_pixel = 200;
+    const int samples_per_pixel = 50;
 
     // Camera
     camera cam;
-    hello_world(world, lights, cam);
+    //hello_world(world, lights, cam);
     //hello_world_IR(world, lights, cam, material_center);
-    //cornell_box(world, lights, cam);
+    cornell_box(world, lights, cam);
 
     // Voxel_Grid
     //SDF.init(world);
@@ -45,7 +45,7 @@ int main() {
                 ray r = cam.get_ray(u, v);
                 //pixel_color += sphere_trace_analytic(r, world);
                 //pixel_color += sphere_trace_voxel(r, world, SDF, 3);
-                pixel_color += path_trace(r, world, 20);
+                pixel_color += path_trace_directL(r, world, lights, 20);
             }
             write_color(std::cout, pixel_color, samples_per_pixel);
         }

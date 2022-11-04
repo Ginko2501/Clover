@@ -4,7 +4,7 @@
 #include "../clover.h"
 
 // Constants
-const double epsilon = 1e-3;
+const double epsilon = 1e-5;
 const double infinity = std::numeric_limits<double>::infinity();
 const double pi = 3.1415926535897932385;
 

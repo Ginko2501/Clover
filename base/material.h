@@ -60,8 +60,9 @@ class lambertian : public material {
                 scatter_direction = n;
 
             rec.r_out = ray(rec.origin, unit_vector(scatter_direction));
-            rec.pdf = pi;
-            rec.brdf = pi; 
+            rec.r_out.orig += epsilon * rec.r_out.dir;
+            rec.pdf = 0.5 / pi;
+            rec.brdf = 1.0 / pi; 
         }
 };
 
@@ -90,7 +91,7 @@ class metal : public material {
 // do not declare as material
 auto material_light = light();
 auto material_light_dim = light(color(1, 1, 1));
-auto material_light_bright = light(color(10, 10, 10));
+auto material_light_bright = light(color(15, 15, 15));
 
 auto material_ground = lambertian(color(0.1, 0.1, 0.0));
 auto material_center = lambertian(color(0.1, 0.2, 0.5));

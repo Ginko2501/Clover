@@ -3,6 +3,8 @@
 
 #include "../clover.h"
 
+auto cornell_box_light = light(color(15, 15, 15));
+
 void cornell_box(hittable_list& world, hittable_list& lights, camera& cam) {
     // front face
     // world.add(make_shared<rectangle>(point3(5, 5, 0),
@@ -44,7 +46,7 @@ void cornell_box(hittable_list& world, hittable_list& lights, camera& cam) {
     shared_ptr<rectangle> top_light = make_shared<rectangle>(point3(5, 10-0.5*epsilon, -5),
                                                   vec3(1, 0, 0),
                                                   vec3(0, 0, 1),
-                                                  &material_light);
+                                                  &cornell_box_light);
     world.add(top_light);
     lights.add(top_light);
 
