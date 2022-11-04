@@ -4,6 +4,9 @@
 #include "../clover.h"
 
 auto cornell_box_light = light(color(15, 15, 15));
+auto cornell_box_red = lambertian(color(0.65, 0.05, 0.05));
+auto cornell_box_green = lambertian(color(0.12, 0.45, 0.15));
+auto cornell_box_white = lambertian(color(0.73, 0.73, 0.73));
 
 void cornell_box(hittable_list& world, hittable_list& lights, camera& cam) {
     // front face
@@ -16,31 +19,31 @@ void cornell_box(hittable_list& world, hittable_list& lights, camera& cam) {
     world.add(make_shared<rectangle>(point3(5, 5, -10),
                                     vec3(5, 0, 0),
                                     vec3(0, 5, 0),
-                                    &lambertian_white));
+                                    &cornell_box_white));
     
     // bottom face
     world.add(make_shared<rectangle>(point3(5, 0, -5),
                                     vec3(5, 0, 0),
                                     vec3(0, 0, 5),
-                                    &lambertian_white));
+                                    &cornell_box_white));
 
     // top face
     world.add(make_shared<rectangle>(point3(5, 10, -5),
                                     vec3(5, 0, 0),
                                     vec3(0, 0, 5),
-                                    &lambertian_white)); 
+                                    &cornell_box_white)); 
 
     // right face  
     world.add(make_shared<rectangle>(point3(10, 5, -5),
                                     vec3(0, 5, 0),
                                     vec3(0, 0, 5),
-                                    &lambertian_green)); 
+                                    &cornell_box_green)); 
 
     // left face                      
     world.add(make_shared<rectangle>(point3(0, 5, -5),
                                     vec3(0, 5, 0),
                                     vec3(0, 0, 5),
-                                    &lambertian_red));
+                                    &cornell_box_red));
     
     // light source
     shared_ptr<rectangle> top_light = make_shared<rectangle>(point3(5, 10-0.5*epsilon, -5),

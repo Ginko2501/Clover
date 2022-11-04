@@ -5,7 +5,7 @@
 
 // iterative approach
 // does not calculate direct light
-color path_trace(ray& r, hittable_list& world, int bounces) {
+color path_trace(ray& r, hittable_list& world, hittable_list& lights, int bounces) {
     color L = color(0, 0, 0);
     color beta = color(1, 1, 1);
 
@@ -22,15 +22,15 @@ color path_trace(ray& r, hittable_list& world, int bounces) {
         // // Russian Roulette
         // if (random_double() >= 1 - 1.0/bounces) {return L;}
 
-        scatter_record s_rec = hit_rec;
-        mat->scatter(r, s_rec);
-        auto cosine = dot(s_rec.r_out.dir, s_rec.normal);
+        sample s = hit_rec;
+        mat->scatter_sample(r, s);
+        auto cosine = dot(s.r_out.dir, s.normal);
         
-        r = s_rec.r_out;
+        r = s.r_out;
         L += beta * mat->emit;
-        beta *= mat->reflectance * cosine * s_rec.brdf / s_rec.pdf;
+        beta *= mat->reflectance * cosine * s.brdf / s.pdf;
         // // Russia Roulette
-        // beta *= mat->reflectance * cosine * s_rec.brdf / s_rec.pdf / (1-1.0/bounces);
+        // beta *= mat->reflectance * cosine * s.brdf / s.pdf / (1-1.0/bounces);
     }
 
     return L;
@@ -50,7 +50,7 @@ color path_trace_directL(ray& r, hittable_list& world, hittable_list& lights, in
     material* sample_mat;
 
     hit_record hit_rec;
-    scatter_record s_rec;
+    sample s;
     for(int i=0;; i++) {
         if(!world.hit(r, epsilon, infinity, hit_rec)) {break;}
 
@@ -90,22 +90,22 @@ color path_trace_directL(ray& r, hittable_list& world, hittable_list& lights, in
         if (random_double() >= 1 - 1.0/bounces){return L;}
 
         // indirect light
-        s_rec = hit_rec;
-        mat->scatter(r, s_rec);
-        auto cosine = dot(s_rec.r_out.dir, hit_rec.normal);
+        s = hit_rec;
+        mat->scatter_sample(r, s);
+        auto cosine = dot(s.r_out.dir, hit_rec.normal);
 
-        r = s_rec.r_out;
+        r = s.r_out;
         if(L_direct == color(0,0,0)) {
             L += beta * mat->emit;
-            // beta *= mat->reflectance * cosine * s_rec.brdf / s_rec.pdf;
+            // beta *= mat->reflectance * cosine * s.brdf / s.pdf;
             // Russia Roulette
-            beta *= mat->reflectance * cosine * s_rec.brdf / s_rec.pdf / (1-1.0/bounces); // Russia Roulette
+            beta *= mat->reflectance * cosine * s.brdf / s.pdf / (1-1.0/bounces); // Russia Roulette
         } else {
             L += 0.5 * L_direct;
             L += 0.5 * beta * mat->emit;
-            // beta *= mat->reflectance * cosine * s_rec.brdf / s_rec.pdf;
+            // beta *= mat->reflectance * cosine * s.brdf / s.pdf;
             // Russia Roulette
-            beta *= 0.5 * mat->reflectance * cosine * s_rec.brdf / s_rec.pdf / (1-1.0/bounces); // Russia Roulette
+            beta *= 0.5 * mat->reflectance * cosine * s.brdf / s.pdf / (1-1.0/bounces); // Russia Roulette
         }
  
     }

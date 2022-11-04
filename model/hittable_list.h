@@ -17,7 +17,7 @@ class hittable_list : public hittable {
 
         inline void add(shared_ptr<hittable> object) {objects.push_back(object);}
 
-        inline shared_ptr<hittable> get(int x) { return objects.at(x);}
+        //inline shared_ptr<hittable> get(int x) { return objects.at(x);}
 
         virtual bool hit(const ray& r, double t_min, double t_max, hit_record& rec) override;
 

@@ -5,7 +5,7 @@
 
 struct hit_record;
 
-// struct scatter_record {
+// struct sample {
 //     ray r_out;
 //     color reflectance;
 //     double pdf;
@@ -14,7 +14,9 @@ struct hit_record;
 
 class material {
     public:
-        virtual void scatter(ray& r_in, scatter_record& s_rec) {}
+        virtual void scatter_sample(ray& r_in, sample& s) {}
+
+        virtual double brdf(point3& p, ray& r_in, ray& r_out) {return 1;}
     
     public:
         std::string name;
@@ -48,10 +50,8 @@ class lambertian : public material {
             reflectance = a;
         }
 
-        virtual void scatter(
-            ray& r_in, scatter_record& rec
-        ) override {
-            auto n = rec.obj->normal(rec.origin);
+        virtual void scatter_sample(ray& r_in, sample& s) override {
+            auto n = s.obj->normal(s.origin);
                  n = dot(r_in.dir, n)>0 ? -n:n;
             auto scatter_direction = n + random_unit_vector();
 
@@ -59,34 +59,34 @@ class lambertian : public material {
             if (is_zero(scatter_direction))
                 scatter_direction = n;
 
-            rec.r_out = ray(rec.origin, unit_vector(scatter_direction));
-            rec.r_out.orig += epsilon * rec.r_out.dir;
-            rec.pdf = 0.5 / pi;
-            rec.brdf = 1.0 / pi; 
+            s.r_out = ray(s.origin, unit_vector(scatter_direction));
+            s.r_out.orig += epsilon * s.r_out.dir;
+            s.pdf = 0.5 / pi;
+            s.brdf = brdf(s.origin, r_in, s.r_out);
         }
+
+        virtual double brdf(point3& p, ray& r_in, ray& r_out) {return 1.0 / pi;}
 };
 
 
-class metal : public material {
-    public:
-        metal(const color& a, double f) {
-            name = "Metal";
-            emit = color(0, 0, 0);
-            reflectance = a;
-            fuzz = f < 1 ? f : 1;
-        }
+// class metal : public material {
+//     public:
+//         metal(const color& a, double f) {
+//             name = "Metal";
+//             emit = color(0, 0, 0);
+//             reflectance = a;
+//             fuzz = f < 1 ? f : 1;
+//         }
 
-        virtual void scatter(
-            ray& r_in, scatter_record& rec
-        ) override {
-            vec3 reflected = reflect(unit_vector(r_in.direction()), rec.obj->normal(rec.origin));
-            rec.r_out = ray(rec.origin, reflected + fuzz*random_in_unit_sphere());
-            //return (dot(scattered.direction(), rec.normal()) > 0);
-        }
+//         virtual void scatter_sample(ray& r_in, sample& s) override {
+//             vec3 reflected = reflect(unit_vector(r_in.direction()), s.obj->normal(s.origin));
+//             s.r_out = ray(s.origin, reflected + fuzz*random_in_unit_sphere());
+//             //return (dot(scattered.direction(), rec.normal()) > 0);
+//         }
 
-    public:
-        double fuzz;
-};
+//     public:
+//         double fuzz;
+// };
 
 // do not declare as material
 auto material_light = light();
@@ -95,9 +95,5 @@ auto material_light_bright = light(color(15, 15, 15));
 
 auto material_ground = lambertian(color(0.1, 0.1, 0.0));
 auto material_center = lambertian(color(0.1, 0.2, 0.5));
-
-auto lambertian_red = lambertian(color(0.65, 0.05, 0.05));
-auto lambertian_green = lambertian(color(0.12, 0.45, 0.15));
-auto lambertian_white = lambertian(color(0.73, 0.73, 0.73));
 
 #endif

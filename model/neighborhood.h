@@ -39,4 +39,19 @@ class scatter_record : public nghd {
         double pdf;
 };
 
+class sample : public nghd {
+    public:
+        sample() {}
+        sample(hit_record& hit_rec) {
+            origin = hit_rec.origin;
+            normal = hit_rec.normal;
+            obj = hit_rec.obj;
+        }
+    
+    public:
+        ray r_out;
+        double pdf;
+        double brdf;
+};
+
 #endif
