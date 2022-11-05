@@ -13,6 +13,7 @@ class rectangle : public hittable {
             vertical = v;
             mat = m;
             n = unit_vector(cross(horizontal, vertical));
+            area = cross(h, v).length();
         }
 
         virtual vec3 normal(const point3& p) override { return n;}
@@ -23,12 +24,15 @@ class rectangle : public hittable {
 
         virtual double dist(const point3& p, hittable*& obj) override;    
 
+        virtual double pdf(ray& r) override;
+
         virtual point3 light_sample() override;
     
     public:
         vec3 horizontal;
         vec3 vertical;
         vec3 n;
+        double area;
 };
 
 bool rectangle::in_range(const point3& p) {
@@ -67,6 +71,14 @@ double rectangle::dist (const point3& p, hittable*& obj) {
     point3 nearest = origin + (x * horizontal) + (y * vertical);
 
     return (p - nearest).length();
+}
+
+double rectangle::pdf(ray& r) {
+    hit_record hit_rec;
+    if(rectangle::hit(r, epsilon, infinity, hit_rec)){
+        return 1 / area;
+    }
+    return 0;
 }
 
 point3 rectangle::light_sample() {

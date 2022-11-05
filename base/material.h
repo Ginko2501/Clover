@@ -16,9 +16,9 @@ class material {
     public:
         virtual ray scatter_sample(ray& r_in, hit_record& rec) {}
 
-        virtual double pdf(point3& p, ray& r_out) {return infinity;}
+        virtual double pdf(ray& r_out, hit_record& hit_rec) {return infinity;}
 
-        virtual double brdf(point3& p, ray& r_in, ray& r_out) {return 1;}
+        virtual double brdf(ray& r_in, ray& r_out, hit_record& hit_rec) {return 1;}
     
     public:
         std::string name;
@@ -63,9 +63,9 @@ class lambertian : public material {
             return r_out;
         }
 
-        virtual double pdf(point3& p, ray& r_out) {return 0.5 / pi;}
+        virtual double pdf(ray& r_out, hit_record& hit_rec) override {return 0.5 / pi;}
 
-        virtual double brdf(point3& p, ray& r_in, ray& r_out) {return 1.0 / pi;}
+        virtual double brdf(ray& r_in, ray& r_out, hit_record& hit_rec) override {return 1.0 / pi;}
 };
 
 

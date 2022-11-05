@@ -10,6 +10,7 @@ class sphere : public hittable {
             origin = o;
             radius = r;
             mat = m;
+            area = (4 * pi * r * r);
             //name = "Sphere";
         }
 
@@ -21,10 +22,13 @@ class sphere : public hittable {
 
         virtual double dist(const point3& p, hittable*& obj) override;
 
+        virtual double pdf(ray& r) override;
+
         virtual point3 light_sample() override;
         
     public:
         double radius;
+        double area;
         //int id;
         //std::string name;
 };
@@ -61,6 +65,14 @@ bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) {
 double sphere::dist(const point3& p, hittable*& obj) {
     obj = this;
     return (p-origin).length() - radius;
+}
+
+double sphere::pdf(ray& r) {
+    hit_record hit_rec;
+    if(sphere::hit(r, epsilon, infinity, hit_rec)){
+        return 1 / area;
+    }
+    return 0;
 }
 
 point3 sphere::light_sample() {

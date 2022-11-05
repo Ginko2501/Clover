@@ -14,8 +14,10 @@ class hittable {
 
         virtual vec3 normal(const point3& p) {return vec3(0, 0, 0);}
 
+        virtual double pdf(ray& r) {return 0;}
+
         virtual point3 light_sample() {}
-    
+       
     public:
         //int id;
         //std::string name;

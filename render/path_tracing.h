@@ -26,8 +26,8 @@ color path_trace(ray& r, hittable_list& world, hittable_list& lights, int bounce
 
         auto r_out = mat->scatter_sample(r, hit_rec);
         auto cosine = dot(r_out.dir, hit_rec.normal);
-        auto brdf = mat->brdf(hit_rec.p, r, r_out);
-        auto pdf = mat->pdf(hit_rec.p, r_out);
+        auto brdf = mat->brdf(r, r_out, hit_rec);
+        auto pdf = mat->pdf(r_out, hit_rec);
         
         r = r_out;
         L += beta * mat->emit;
@@ -38,83 +38,80 @@ color path_trace(ray& r, hittable_list& world, hittable_list& lights, int bounce
     return L;
 }
 
-// // direct light approach 
-// color path_trace_directL(ray& r, hittable_list& world, hittable_list& lights, int bounces) {
-//     // L is accumulative light
-//     // beta is decaying factor
-//     color L = color(0, 0, 0);
-//     color beta = color(1, 1, 1);
+// direct light approach 
+color path_trace_directL(ray& r, hittable_list& world, hittable_list& lights, int bounces) {
+    // L is accumulative light
+    // beta is decaying factor
+    color L = color(0, 0, 0);
+    color beta = color(1, 1, 1);
 
-//     // variables for sampling at light source
-//     ray rL;
-//     point3 pL;
-//     material* matL;
-//     hit_record hitL;
+    // variables for sampling at light source
+    ray rL;
+    point3 pL;
+    material* matL;
+    hit_record hitL;
 
-//     hit_record hit_rec;
-//     for(int i=0;; i++) {
-//         if(!world.hit(r, epsilon, infinity, hit_rec)) {break;}
+    // PDFs
+    double pdfLL; // light ray as light pdf
+    double pdfLS; // light ray as scatter pdf
+    double pdfSL; // scatter ray as light pdf
+    double pdfSS; // sactter ray as scatter pdf
 
-//         material* mat = hit_rec.obj->mat;
-//         if(mat->name == "Light") {
-//             // stop tracing if hits light
-//             L += beta * mat->emit;
-//             break;
-//         }
+    hit_record hit_rec;
+    for(int i=0;; i++) {
+        if(!world.hit(r, epsilon, infinity, hit_rec)) {break;}
 
-//         // direct light
-//         auto Ld = color(0, 0, 0);
-//         for(int j=0; j<1; j++) {
-//             pL = lights.light_sample();
-//             rL = ray(hit_rec.p, unit_vector(pL - hit_rec.p));
+        material* mat = hit_rec.obj->mat;
+        if(mat->name == "Light") {
+            // stop tracing if hits light
+            L += beta * mat->emit;
+            break;
+        }
 
-//             // check if hit anything
-//             if(!world.hit(rL, epsilon, infinity, hitL)) {continue;}
+        // Russian Roulette
+        if (random_double() >= 1 - 1.0/bounces){return L;}
 
-//             // check if hits light
-//             matL = hitL.obj->mat;
-//             if(matL->name != "Light") {continue;}
+        // indirect light
+        auto rS = mat->scatter_sample(r, hit_rec);
+        auto cosine = dot(rS.dir, hit_rec.normal);
+        auto brdfS = mat->brdf(r, rS, hit_rec);
 
-//             // check if hits the sampled point
-//             if(pL != hitL.p) {continue;}
+        // direct light
+        pL = lights.light_sample();
+        rL = ray(hit_rec.p, unit_vector(pL - hit_rec.p));
 
-//             auto dist_sq = (pL - hit_rec.p).length_squared();
-//             auto cosine  = - dot(hitL.normal, rL.dir);
-//             auto cosineL =   dot(hit_rec.normal, rL.dir); // cosine term at hittable object
-            
-//             // check if the direct light is on the right side of the surface
-//             if(cosineL <= 0) {continue;}
-            
-//             Ld = beta * mat->reflectance * matL->emit *
-//                  cosine * cosineL / dist_sq / s.pdf;
-//         }
+        // check if hit anything
+        if(world.hit(rL, epsilon, infinity, hitL)){
+            // check if hits light
+            matL = hitL.obj->mat;
+            if(matL->name != "Light") {continue;}
 
-//         // Russian Roulette
-//         if (random_double() >= 1 - 1.0/bounces){return L;}
+            // check if hits the sampled point
+            if(pL != hitL.p) {continue;}
 
-//         // indirect light
-//         auto r_out = mat->scatter_sample(r, hit_rec);
-//         auto cosine = dot(r_out.dir, hit_rec.normal);
-//         auto brdf = mat->brdf(hit_rec.p, r, r_out);
-//         auto pdf = mat->pdf(hit_rec.p, r_out);
+            // check if the direct light is on the right side of the surface
+            auto cosineL =   dot(hit_rec.normal, rL.dir); // cosine term at light source
+            if(cosineL <= 0) {continue;}
 
-//         r = r_out;
+            auto cosineS  = - dot(hitL.normal, rL.dir); // cosine term at scatter surface
+            auto dist_sq = (pL - hit_rec.p).length_squared();
+            auto brdfL = matL->brdf(rL, rL, hitL); 
 
-//         if(Ld == color(0,0,0)) {
-//             L += beta * mat->emit;
-//             // beta *= mat->reflectance * cosine * s.brdf / s.pdf;
-//             // Russia Roulette
-//             beta *= mat->reflectance * cosine * s.brdf / s.pdf / (1-1.0/bounces); // Russia Roulette
-//         } else {
-//             L += 0.5 * Ld;
-//             L += 0.5 * beta * mat->emit;
-//             // beta *= mat->reflectance * cosine * s.brdf / s.pdf;
-//             // Russia Roulette
-//             beta *= 0.5 * mat->reflectance * cosine * s.brdf / s.pdf / (1-1.0/bounces); // Russia Roulette
-//         }
- 
-//     }
-//     return L;
-// }
+            pdfLL = hitL.obj->pdf(rL);
+            pdfLS = mat->pdf(rL, hit_rec);
+
+            L += beta * mat->reflectance * matL->emit * brdfL * 
+                 cosineS * cosineL / dist_sq / pdfLL / (pdfLL + pdfLS);
+        }
+
+        pdfSL = hitL.obj->pdf(rS);
+        pdfSS = mat->pdf(rS, hit_rec);
+
+        r = rS;
+        L += beta * mat->emit / (pdfSL + pdfSS);
+        beta *= mat->reflectance * cosine * brdfS / pdfSS / (1-1.0/bounces);
+    }
+    return L;
+}
 
 #endif
