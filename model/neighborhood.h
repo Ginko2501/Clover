@@ -24,34 +24,34 @@ class hit_record : public nghd {
         double t;
 };
 
-class scatter_record : public nghd {
-    public:
-        scatter_record() {}
-        scatter_record(hit_record& hit_rec) {
-            origin = hit_rec.origin;
-            normal = hit_rec.normal;
-            obj = hit_rec.obj;
-        }
+// class scatter_record : public nghd {
+//     public:
+//         scatter_record() {}
+//         scatter_record(hit_record& hit_rec) {
+//             origin = hit_rec.origin;
+//             normal = hit_rec.normal;
+//             obj = hit_rec.obj;
+//         }
 
-    public:
-        ray r_out;
-        double brdf;
-        double pdf;
-};
+//     public:
+//         ray r_out;
+//         double brdf;
+//         double pdf;
+// };
 
-class sample : public nghd {
-    public:
-        sample() {}
-        sample(hit_record& hit_rec) {
-            origin = hit_rec.origin;
-            normal = hit_rec.normal;
-            obj = hit_rec.obj;
-        }
+// class sample : public nghd {
+//     public:
+//         sample() {}
+//         sample(hit_record& hit_rec) {
+//             origin = hit_rec.origin;
+//             normal = hit_rec.normal;
+//             obj = hit_rec.obj;
+//         }
     
-    public:
-        ray r_out;
-        double pdf;
-        double brdf;
-};
+//     public:
+//         ray r_out;
+//         double pdf;
+//         double brdf;
+// };
 
 #endif

@@ -21,7 +21,7 @@ class sphere : public hittable {
 
         virtual double dist(const point3& p, hittable*& obj) override;
 
-        virtual point3 sample(double& pdf) override;
+        virtual point3 light_sample() override;
         
     public:
         double radius;
@@ -63,8 +63,7 @@ double sphere::dist(const point3& p, hittable*& obj) {
     return (p-origin).length() - radius;
 }
 
-point3 sphere::sample(double& pdf) {
-    pdf = 4 * pi * radius * radius;
+point3 sphere::light_sample() {
     return origin + radius * random_unit_vector();
 }
 

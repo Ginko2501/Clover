@@ -14,7 +14,9 @@ struct hit_record;
 
 class material {
     public:
-        virtual void scatter_sample(ray& r_in, sample& s) {}
+        virtual ray scatter_sample(ray& r_in, hit_record& rec) {}
+
+        virtual double pdf(point3& p, ray& r_out) {return infinity;}
 
         virtual double brdf(point3& p, ray& r_in, ray& r_out) {return 1;}
     
@@ -50,20 +52,18 @@ class lambertian : public material {
             reflectance = a;
         }
 
-        virtual void scatter_sample(ray& r_in, sample& s) override {
-            auto n = s.obj->normal(s.origin);
-                 n = dot(r_in.dir, n)>0 ? -n:n;
-            auto scatter_direction = n + random_unit_vector();
+        virtual ray scatter_sample(ray& r_in, hit_record& rec) override {
+            auto scatter_direction = rec.normal + random_unit_vector();
 
             // Catch degenerate scatter direction
             if (is_zero(scatter_direction))
-                scatter_direction = n;
+                scatter_direction = rec.normal;
 
-            s.r_out = ray(s.origin, unit_vector(scatter_direction));
-            s.r_out.orig += epsilon * s.r_out.dir;
-            s.pdf = 0.5 / pi;
-            s.brdf = brdf(s.origin, r_in, s.r_out);
+            ray r_out = ray(rec.origin, unit_vector(scatter_direction));
+            return r_out;
         }
+
+        virtual double pdf(point3& p, ray& r_out) {return 0.5 / pi;}
 
         virtual double brdf(point3& p, ray& r_in, ray& r_out) {return 1.0 / pi;}
 };

@@ -23,7 +23,7 @@ class rectangle : public hittable {
 
         virtual double dist(const point3& p, hittable*& obj) override;    
 
-        virtual point3 sample(double& pdf) override;
+        virtual point3 light_sample() override;
     
     public:
         vec3 horizontal;
@@ -69,10 +69,9 @@ double rectangle::dist (const point3& p, hittable*& obj) {
     return (p - nearest).length();
 }
 
-point3 rectangle::sample(double& pdf) {
+point3 rectangle::light_sample() {
     double x = 2*random_double() - 1;
     double y = 2*random_double() - 1;
-    pdf = 4 * cross(horizontal, vertical).length();
     return origin + x*horizontal + y*vertical;
 }
 

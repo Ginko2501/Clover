@@ -14,7 +14,7 @@ class hittable {
 
         virtual vec3 normal(const point3& p) {return vec3(0, 0, 0);}
 
-        virtual point3 sample(double& pdf) {return point3(infinity, infinity, infinity);}
+        virtual point3 light_sample() {}
     
     public:
         //int id;

@@ -23,7 +23,7 @@ class hittable_list : public hittable {
 
         virtual double dist(const point3& p, hittable*& obj) override;
 
-        virtual point3 sample(double& pdf) override;
+        virtual point3 light_sample() override;
 
     public:
         std::vector<shared_ptr<hittable>> objects;
@@ -61,11 +61,12 @@ double hittable_list::dist(const point3& p, hittable*& obj) {
     return min_d;
 }
 
-point3 hittable_list::sample(double& pdf) {
+point3 hittable_list::light_sample() {
     auto n = objects.size();
     for(const auto& object: objects){
-        if(random_double() < 1/n)
-            return object->sample(pdf);
+        if(random_double() < 1/n) {
+            return object->light_sample();
+        }
         n--;
     }
 }
