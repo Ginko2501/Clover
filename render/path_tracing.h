@@ -58,7 +58,7 @@ color path_trace_directL(ray& r, hittable_list& world, hittable_list& lights, in
     double pdfSS; // sactter ray as scatter pdf
 
     hit_record hit_rec;
-    for(int i=0;; i++) {
+    for(int i=0; i<bounces; i++) {
         if(!world.hit(r, epsilon, infinity, hit_rec)) {break;}
 
         material* mat = hit_rec.obj->mat;
@@ -69,7 +69,7 @@ color path_trace_directL(ray& r, hittable_list& world, hittable_list& lights, in
         }
 
         // Russian Roulette
-        if (random_double() >= 1 - 1.0/bounces){return L;}
+        // if (random_double() >= 1 - 1.0/bounces){return L;}
 
         // indirect light
         auto rS = mat->scatter_sample(r, hit_rec);
@@ -82,34 +82,42 @@ color path_trace_directL(ray& r, hittable_list& world, hittable_list& lights, in
 
         // check if hit anything
         if(world.hit(rL, epsilon, infinity, hitL)){
+            bool flag = true;
+
             // check if hits light
             matL = hitL.obj->mat;
-            if(matL->name != "Light") {continue;}
+            if(matL->name != "Light") {flag=false;}
 
             // check if hits the sampled point
-            if(pL != hitL.p) {continue;}
+            if(pL != hitL.p) {flag=false;}
 
             // check if the direct light is on the right side of the surface
-            auto cosineL =   dot(hit_rec.normal, rL.dir); // cosine term at light source
-            if(cosineL <= 0) {continue;}
+            auto cosineL = dot(hit_rec.normal, rL.dir); // cosine term at light source
+            if(cosineL <= 0) {flag=false;}
 
-            auto cosineS  = - dot(hitL.normal, rL.dir); // cosine term at scatter surface
-            auto dist_sq = (pL - hit_rec.p).length_squared();
-            auto brdfL = matL->brdf(rL, rL, hitL); 
+            if(flag){
+                auto cosineS = - dot(hitL.normal, rL.dir); // cosine term at scatter surface
+                auto dist_sq = (pL - hit_rec.p).length_squared();
+                auto brdfL = matL->brdf(rL, rL, hitL); 
 
-            pdfLL = hitL.obj->pdf(rL);
-            pdfLS = mat->pdf(rL, hit_rec);
+                pdfLL = hitL.obj->pdf(rL);
+                pdfLS = mat->pdf(rL, hit_rec);
 
-            L += beta * mat->reflectance * matL->emit * brdfL * 
-                 cosineS * cosineL / dist_sq / pdfLL / (pdfLL + pdfLS);
+                // L += beta * mat->reflectance * matL->emit * brdfL * 
+                //      cosineS * cosineL / dist_sq / pdfLL;
+                L += beta * mat->reflectance * matL->emit * brdfL * 
+                     cosineS * cosineL / dist_sq / pdfLL / (pdfLL + pdfLS);
+            }
         }
 
         pdfSL = hitL.obj->pdf(rS);
         pdfSS = mat->pdf(rS, hit_rec);
 
         r = rS;
+        //L += beta * mat->emit;
         L += beta * mat->emit / (pdfSL + pdfSS);
-        beta *= mat->reflectance * cosine * brdfS / pdfSS / (1-1.0/bounces);
+        beta *= mat->reflectance * cosine * brdfS / pdfSS;
+        //beta *= mat->reflectance * cosine * brdfS / pdfSS / (1-1.0/bounces);
     }
     return L;
 }

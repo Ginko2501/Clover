@@ -5,7 +5,7 @@
 
 // Russian Roulette approach
 // expectedly compute all bounces, but with high variance
-color path_trace_recursive(ray& r, hittable_list& world, int bounces) {
+color path_trace_recursive(ray& r, hittable_list& world, hittable_list& lights, int bounces) {
     hit_record hit_rec;
     if(world.hit(r, epsilon, infinity, hit_rec)){
         material* mat = hit_rec.obj->mat;
@@ -17,14 +17,14 @@ color path_trace_recursive(ray& r, hittable_list& world, int bounces) {
         if (random_double() >= 1 - 1.0/bounces)
             return color(0, 0, 0); 
 
-        scatter_record s_rec;
-        mat->scatter(r, hit_rec, s_rec);
-        auto n = hit_rec.obj->normal(hit_rec.p);
-        if(dot(n, r.dir)>0) n=-n;
-        auto cosine = dot(s_rec.r_out.dir, n);
+        auto r_out = mat->scatter_sample(r, hit_rec);
+        auto cosine = dot(hit_rec.normal, r_out.dir);
+        auto brdf = mat->brdf(r, r_out, hit_rec);
+        auto pdf = mat->pdf(r_out, hit_rec);
 
         return mat->emit + 
-               mat->reflectance * cosine * path_trace_recursive(s_rec.r_out, world, bounces) / s_rec.pdf / 0.8;
+               mat->reflectance * path_trace_recursive(r_out, world, lights, bounces) *
+               cosine * brdf / pdf / (1-1.0/bounces);
     }
 
     return color(0, 0, 0);
