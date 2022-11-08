@@ -40,6 +40,7 @@
 #include "inverse rendering/loss.h"
 
 // scene
+#include "scene/sanity_check.h"
 #include "scene/hello_world.h"
 #include "scene/hello_world_IR.h"
 #include "scene/cornell_box.h"
