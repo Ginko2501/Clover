@@ -40,11 +40,11 @@ double loss() {
     double res = 0;
     for(int j=I_height; j>=0; j--) {
         for(int i=0; i<I_width; i++) {
-            res += (I[j][i] - GT[j][i]).length_squared();
+            res += (I[j][i] - GT[j][i]).length_squared() / I_height / I_width;
         }
     }
 
-    return sqrt(res);
+    return res;
 }
 
 #endif
