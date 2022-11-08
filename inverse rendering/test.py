@@ -1,0 +1,9 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+a = [1, 2, 3]
+
+a = a * 0.5
+
+fix, ax = plt.plot()
+ax.plot(a)

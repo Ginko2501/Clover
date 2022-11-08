@@ -6,9 +6,9 @@ import numpy as np
 # print(img.read())
 
 # Ground Truth image
-img = cv.imread("./GT.ppm")
-cv.imwrite("./GT.jpg", img)
+img = cv.imread("c:/Zichen/Cornell/fall2022/CS4999/clover/inverse rendering/GT.ppm")
+cv.imwrite("c:/Zichen/Cornell/fall2022/CS4999/clover/inverse rendering/GT.jpg", img)
 
 # currenet image 
-img = cv.imread("./I.ppm")
-cv.imwrite("./I.jpg", img)
+img = cv.imread("c:/Zichen/Cornell/fall2022/CS4999/clover/inverse rendering/I.ppm")
+cv.imwrite("c:/Zichen/Cornell/fall2022/CS4999/clover/inverse rendering/I.jpg", img)
