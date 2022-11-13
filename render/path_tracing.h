@@ -92,13 +92,13 @@ color path_trace_directL(ray& r, hittable_list& world, hittable_list& lights, in
             if(pL != hitL.p) {flag=false;}
 
             // check if the direct light is on the right side of the surface
-            auto cosineL = dot(hit_rec.normal, rL.dir); // cosine term at light source
-            if(cosineL <= 0) {flag=false;}
+            auto cosineS = dot(hit_rec.normal, rL.dir); // cosine term at light source
+            if(cosineS <= 0) {flag=false;}
 
             if(flag){
-                auto cosineS = - dot(hitL.normal, rL.dir); // cosine term at scatter surface
+                auto cosineL = - dot(hitL.normal, rL.dir); // cosine term at scatter surface
                 auto dist_sq = (pL - hit_rec.p).length_squared();
-                auto brdfL = matL->brdf(rL, rL, hitL); 
+                auto brdfL = mat->brdf(r, rL, hit_rec); //TBD
 
                 pdfLL = hitL.obj->pdf(rL);
                 pdfLS = mat->pdf(rL, hit_rec);
