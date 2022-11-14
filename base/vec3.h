@@ -141,7 +141,7 @@ inline bool is_parallel(vec3 &u, vec3 &v) {
     return dot(unit_vector(u), unit_vector(v)) == 1.0;
 }
 
-inline bool is_zero(vec3 &v) {
+inline bool is_zero(vec3 v) {
     return fabs(v.x())<epsilon && fabs(v.y())<epsilon && fabs(v.z())<epsilon;
 }
 

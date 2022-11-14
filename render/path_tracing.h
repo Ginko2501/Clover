@@ -89,7 +89,7 @@ color path_trace_directL(ray& r, hittable_list& world, hittable_list& lights, in
             if(matL->name != "Light") {flag=false;}
 
             // check if hits the sampled point
-            if(pL != hitL.p) {flag=false;}
+            if(!is_zero(pL - hitL.p)) {flag=false;}
 
             // check if the direct light is on the right side of the surface
             auto cosineS = dot(hit_rec.normal, rL.dir); // cosine term at light source

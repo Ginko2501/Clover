@@ -44,6 +44,7 @@
 #include "scene/hello_world.h"
 #include "scene/hello_world_IR.h"
 #include "scene/cornell_box.h"
+#include "scene/two_sphere.h"
 
 // Usings
 using std::shared_ptr;
