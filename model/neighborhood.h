@@ -8,7 +8,7 @@ class material;
 
 class neighborhood {
     public:
-        nghd() {}
+        neighborhood() {}
 
     public:
         point3 origin;
@@ -16,9 +16,7 @@ class neighborhood {
         hittable* obj;
 };
 
-using nghd = neighborhood;
-
-class hit_record : public nghd {
+class hit_record : public neighborhood {
     public:
         point3 p;
         double t;
