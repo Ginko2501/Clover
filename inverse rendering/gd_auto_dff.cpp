@@ -11,7 +11,7 @@ voxel_grid SDF;
 const auto aspect_ratio = 1.0;
 const int image_width = 256;
 const int image_height = static_cast<int>(image_width / aspect_ratio);
-const int samples_per_pixel = 50;
+const int samples_per_pixel = 200;
 const double step_size = 5e-6;
 
 // initialize center material with random blue color
@@ -19,6 +19,8 @@ auto center = lambertian(color(0.1, 0.2, 0.3));
 vector<int> loss_record;
 vector<color> color_record;
 vector<color> gradient_record;
+
+extern vec3 __enzyme__autodiff(void*, vec3);
 
 void render() {
     // update world scene
@@ -46,28 +48,7 @@ void render() {
     std::cerr << "Rendered once.\n";
 }
 
-// finite difference derivative w.s.t. one variable
-double compute_derivative(int x) {
-    // compute loss(x-)
-    center.reflectance.e[x] -= 0.01;
-    render();
-    auto loss_l = loss();
 
-    // compute loss(x+)
-    center.reflectance.e[x] += 0.02;
-    render();
-    auto loss_r = loss();
-
-    center.reflectance.e[x] -= 0.01;
-    return (loss_r - loss_l) / 0.01;
-}
-
-color compute_gradient() {
-    auto dr = compute_derivative(0);
-    auto dg = compute_derivative(1);
-    auto db = compute_derivative(2);
-    return color(dr, dg, db);
-}
 
 int main() {
     // world scene
