@@ -63,7 +63,7 @@ class lambertian : public material {
             return r_out;
         }
 
-        virtual double pdf(ray& r_out, hit_record& hit_rec) override {return 0.5 / pi;}
+        virtual double pdf(ray& r_out, hit_record& hit_rec) override {return 2.0 / pi;}
 
         virtual double brdf(ray& r_in, ray& r_out, hit_record& hit_rec) override {return 1.0 / pi;}
 };

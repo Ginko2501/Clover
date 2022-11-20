@@ -17,10 +17,10 @@ int main() {
     // Camera
     camera cam;
     //sanity_check(world, lights, cam);
-    //hello_world(world, lights, cam);
+    hello_world(world, lights, cam);
     //hello_world_IR(world, lights, cam, material_center);
     //cornell_box(world, lights, cam);
-    two_spheres(world, lights, cam);
+    //two_spheres(world, lights, cam);
 
     // Voxel_Grid
     //SDF.init(world);
