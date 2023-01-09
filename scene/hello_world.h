@@ -14,7 +14,7 @@ void hello_world(hittable_list& world, hittable_list& lights, camera& cam) {
     shared_ptr<rectangle> top_light = make_shared<rectangle>(point3(0, 10, -1),
                                                              vec3(10, 0, 0),
                                                              vec3(0, 0, 10),
-                                                             &material_light_dim);
+                                                             &material_light);
     world.add(top_light);
     lights.add(top_light);
 
